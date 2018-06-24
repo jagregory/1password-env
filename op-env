@@ -7,9 +7,14 @@ set -o pipefail
 
 key="$*"
 
-if [ -z "$key" ]; then
+if [ -z "$key" ] || [ "$key" == "--help" ] || [ "$key" == "-h" ]; then
   echo 'usage: op-env <key>' >&2
   exit 1
+fi
+
+if [ "$key" == "--version" ] || [ "$key" == "-v" ]; then
+  echo '1.0.0-alpha' >&2
+  exit 0
 fi
 
 # shellcheck source=lib/signin.sh
