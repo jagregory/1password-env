@@ -29,8 +29,10 @@ function default_secretkey {
 }
 
 function load_saved_session {
-  [ -f "$HOME/.1password/session" ] && \
-    source "$HOME/.1password/session" || true
+  [ -f "$HOME/.1password-tools/defaults" ] && \
+    source "$HOME/.1password-tools/defaults"
+  [ -f "$HOME/.1password-tools/session" ] && \
+    source "$HOME/.1password-tools/session"
 }
 
 function ensure_signed_in {
@@ -54,11 +56,13 @@ function ensure_signed_in {
 
   session=$(op signin "$vault" "$email" "$secretkey" --output=raw)
   
-  mkdir -p "$HOME/.1password" >/dev/null 2>&1
-  cat > "$HOME/.1password/session" << EOF
-export OP_SESSION_$vault='$session'
+  mkdir -p "$HOME/.1password-tools" >/dev/null 2>&1
+  cat > "$HOME/.1password-tools/defaults" << EOF
 export OP_DEFAULT_VAULT='$vault'
 export OP_DEFAULT_EMAIL='$email'
+EOF
+  cat > "$HOME/.1password-tools/session" << EOF
+export OP_SESSION_$vault='$session'
 EOF
 
   load_saved_session
