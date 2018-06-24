@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+scriptdir=$(dirname "$0")
+
 set -e
 set -o pipefail
 
@@ -10,10 +12,16 @@ if [ -z "$key" ]; then
   exit 1
 fi
 
-echo 'Loading environment from 1Password secret...'
+# shellcheck source=lib/signin.sh
+source "$scriptdir/lib/signin.sh"
+
+ensure_signed_in
+
+echo -n 'Loading environment from 1Password secret... ' >&2
 vars=$(op get item "$key" | jq -rc '.details.sections | map(select(.title == "env")) | .[0].fields | map("" +(.t) + "='\''" + (.v) + "'\''") | join(" ")')
+echo -e '\x1B[0;32m✔\x1B[0m' >&2
 
 clear
-echo "** Temporary shell for $key **"
-echo
+echo "🔒 Temporary shell for $key 🔒" >&2
+echo >&2
 exec sh -c "env $vars OP_ENV='$key' $SHELL"
