@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+key="$*"
+
+if [ -z "$key" ]; then
+  echo 'usage: op-env <key>' >&2
+  exit 1
+fi
+
+echo 'Loading environment from 1Password secret...'
+vars=$(op get item "$key" | jq -rc '.details.sections | map(select(.title == "env")) | .[0].fields | map("" +(.t) + "='\''" + (.v) + "'\''") | join(" ")')
+
+clear
+echo "** Temporary shell for $key **"
+echo
+exec sh -c "env $vars OP_ENV='$key' $SHELL"
