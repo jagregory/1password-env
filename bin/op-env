@@ -23,7 +23,7 @@ source "$scriptdir/lib/signin.sh"
 ensure_signed_in
 
 echo -n 'Loading environment from 1Password secret... ' >&2
-vars=$(op get item "$key" | jq -rc '.details.sections | map(select(.title == "env")) | .[0].fields | map("" +(.t) + "='\''" + (.v) + "'\''") | join(" ")')
+vars=$(op get item "$key" | jq -rc '.details.sections | map(select(.title | test("^env$", "i"))) | .[0].fields | map("" +(.t) + "='\''" + (.v) + "'\''") | join(" ")')
 echo -e '\x1B[0;32m✔\x1B[0m' >&2
 
 clear
