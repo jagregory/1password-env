@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+TOKEN_DIR="$HOME/.1password-env"
+
 function default_vault {
   echo -n "Vault" >&2
   [ ! -z "$OP_DEFAULT_VAULT" ] && echo -n " ($OP_DEFAULT_VAULT)" >&2
@@ -29,10 +31,12 @@ function default_secretkey {
 }
 
 function load_saved_session {
-  [ -f "$HOME/.1password-tools/defaults" ] && \
-    source "$HOME/.1password-tools/defaults"
-  [ -f "$HOME/.1password-tools/session" ] && \
-    source "$HOME/.1password-tools/session"
+  if [ -f "$TOKEN_DIR/defaults" ]; then
+    source "$TOKEN_DIR/defaults"
+  fi
+  if [ -f "$TOKEN_DIR/session" ]; then
+    source "$TOKEN_DIR/session"
+  fi
 }
 
 function ensure_signed_in {
@@ -56,14 +60,16 @@ function ensure_signed_in {
 
   session=$(op signin "$vault" "$email" "$secretkey" --output=raw)
   
-  mkdir -p "$HOME/.1password-tools" >/dev/null 2>&1
-  cat > "$HOME/.1password-tools/defaults" << EOF
+  mkdir -p "$TOKEN_DIR" >/dev/null 2>&1
+  chmod 700 "$TOKEN_DIR" >/dev/null 2>&1
+  cat > "$TOKEN_DIR/defaults" << EOF
 export OP_DEFAULT_VAULT='$vault'
 export OP_DEFAULT_EMAIL='$email'
 EOF
-  cat > "$HOME/.1password-tools/session" << EOF
+  cat > "$TOKEN_DIR/session" << EOF
 export OP_SESSION_$vault='$session'
 EOF
+  chmod -R 600 "$TOKEN_DIR/"*
 
   load_saved_session
 }
