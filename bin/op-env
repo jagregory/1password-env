@@ -13,7 +13,7 @@ if [ -z "$key" ] || [ "$key" == "--help" ] || [ "$key" == "-h" ]; then
 fi
 
 if [ "$key" == "--version" ] || [ "$key" == "-v" ]; then
-  echo '1.0.0-alpha' >&2
+  echo '1.0.0' >&2
   exit 0
 fi
 
